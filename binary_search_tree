@@ -1,0 +1,82 @@
+class Node:
+    def __init__(self, value=None):
+        if value is None or not isinstance(value, int):
+            raise ValueError("A valid integer value must be provided for the Node.")
+
+        self.parent = None
+        self.child_left = None
+        self.child_right = None
+        self.value = value
+        self.explored = False
+        self.visited = False
+
+    def __str__(self):
+        return f"value is {self.value}, \n" \
+               f"parent is {self.parent}, \n" \
+               f"child on the left is {self.child_left.value if self.child_left is not None else None}, \n"\
+               f"child on the right is {self.child_right.value if self.child_right is not None else None}, \n"\
+               f"This node is {'' if self.explored else 'not'} explored, \n" \
+               f"This node is {'' if self.visited else 'not'} visited, \n"
+
+    def __setattr__(self, name, value):
+        if name in {"value"} and not isinstance(value, int):
+            raise ValueError("value of the Node must always be a valid integer.")
+        else:
+            super().__setattr__(name, value)
+        if name in {"parent", "child_left", "child_right"} and not (isinstance(value, Node) or value is None):
+            raise ValueError("value of the Node must always be a valid integer.")
+        else:
+            super().__setattr__(name, value)
+
+
+def insert_a_node(new_node, root_node):
+    if not isinstance(new_node, Node):
+        raise ValueError(f"only object of {type(Node)}  {Node.__name__} can be inserted in the binary tree")
+    if not isinstance(root_node, Node):
+        raise ValueError(f"only object of {type(Node)}  {Node.__name__} can be a root in the binary tree")
+    if new_node.value < root_node.value:
+        if root_node.child_left is not None:
+            insert_a_node(new_node, root_node.child_left)
+        else:
+            root_node.child_left = new_node
+    elif new_node.value > root_node.value:
+        if root_node.child_right is not None:
+            insert_a_node(new_node, root_node.child_right)
+        else:
+            root_node.child_right = new_node
+    else:
+        pass
+
+
+def insert_a_list_of_int_in_tree(list_of_int, root_node=None):
+    list_of_int = list(filter(None, list_of_int))
+    if not list_of_int:
+        return root_node
+    else:
+        if root_node is None:
+            root_node = Node(value=list_of_int[0])
+            list_of_int.remove(list_of_int[0])
+    for numbers in list_of_int:
+        new_node = Node(value=numbers)
+        insert_a_node(new_node=new_node, root_node=root_node)
+    return root_node
+
+
+def find_a_number_in_tree(number, root_node):
+    if number is None or not isinstance(number, int) or root_node is None or not isinstance(root_node, Node):
+        return False
+    else:
+        if root_node.value == number:
+            return True
+        elif root_node.value > number:
+            return find_a_number_in_tree(number, root_node.child_left)
+        elif root_node.value < number:
+            return find_a_number_in_tree(number, root_node.child_right)
+
+
+array_for_tree = [10, 98, 25, 1, 2, 45, 35, None, 36, 25, 47, 12, 2, 6, 8, 7, 58]
+root_node_1 = insert_a_list_of_int_in_tree(list_of_int=array_for_tree, root_node=None)
+
+print(find_a_number_in_tree(number=7, root_node=root_node_1))
+
+
